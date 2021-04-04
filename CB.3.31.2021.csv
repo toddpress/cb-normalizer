@@ -1,4 +1,4 @@
-portfolio,trade id,product,side,created at,size,size unit,price,fee,total,"price/fee/total unit"
+portfolio,trade id,product,side,created at,size,size unit,price,fee,total,price/fee/total unit
 default,0,XLM-USD,BUY,2021-02-23T14:33:10.294Z,25,XLM,0.393586,0.04919825,-9.88884825,"USD"
 default,0,XLM-USD,BUY,2021-03-04T03:15:22.509Z,11,XLM,0.423,0.023265,-4.676265,"USD"
 default,0,XLM-USD,BUY,2021-03-04T22:04:32.469Z,24,XLM,0.408921,0.04907052,-9.86317452,"USD"

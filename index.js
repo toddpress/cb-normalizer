@@ -33,12 +33,13 @@ const getTransformerForColumn = (column) =>
 
 const transformCoinbaseEntry = ([k, v], i) => {
   const unifiedColumn = getUnifiedColumnName(k);
+  debugger;
   const transformedValue = getTransformerForColumn(k)(v);
   return [unifiedColumn, transformedValue];
 };
 
 const transformResults = (obj, mappingFn) =>
-  Object.fromEntries(Object.entries(obj).map(mappingFn));
+  Object.fromEntries(Object.entries(obj).map(mappingFn).filter(([k, v]) => k !== undefined));
 
 const processFile = async (url) => {
   let output = [];
