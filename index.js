@@ -3,8 +3,8 @@ import csv from 'csv';
 
 // Data Maps
 const UNIFIED_KEYS_BY_COLUMN = {
-  'created at': 'Date(UTC)',
   'price/fee/total unit': 'Fee Coin',
+  'created at': 'Date(UTC)',
   product: 'Market',
   size: 'Amount',
   price: 'Price',
@@ -33,13 +33,16 @@ const getTransformerForColumn = (column) =>
 
 const transformCoinbaseEntry = ([k, v], i) => {
   const unifiedColumn = getUnifiedColumnName(k);
-  debugger;
   const transformedValue = getTransformerForColumn(k)(v);
   return [unifiedColumn, transformedValue];
 };
 
 const transformResults = (obj, mappingFn) =>
-  Object.fromEntries(Object.entries(obj).map(mappingFn).filter(([k, v]) => k !== undefined));
+  Object.fromEntries(
+    Object.entries(obj)
+      .map(mappingFn)
+      .filter(([k, v]) => k !== undefined)
+  );
 
 const processFile = async (url) => {
   let output = [];
@@ -61,6 +64,7 @@ const processFile = async (url) => {
 
 // Declare the work.
 const processCoinbaseRecords = async (url) => await processFile(url);
+
 // Do the work.
 (async () => {
   const records = await processCoinbaseRecords('./CB.3.31.2021.csv');
