@@ -20,6 +20,8 @@ const VALUE_TRANSFORMERS_BY_ORIG_COLUMN = {
   side: (val) => val.toUpperCase(),
 };
 
+const getUnifiedColumnsFromMap = (map) => Object.values(map);
+
 const getColumnFromMap = (map) => (column) => map[column];
 
 const getUnifiedColumnName = (column) =>
@@ -56,6 +58,7 @@ const processFile = async (url) => {
 
   for await (const row of parser) {
     const transformed = transformResults(row, transformCoinbaseEntry);
+    //TODO - will need another transforming mechanism, like a reducing/mapping fn
     output.push(transformed);
   }
 
@@ -67,6 +70,31 @@ const processCoinbaseRecords = async (url) => await processFile(url);
 
 // Do the work.
 (async () => {
+  // initialize output array
+  let output = []
+
+  //1. get all CSVs for CB exports
+  //TODO - implement
+
+  //2. iterate through files
+  //TODO - implement
+
+  //3. transform coinbase CSVs into Binance obj arrays.
   const records = await processCoinbaseRecords('./CB.3.31.2021.csv');
+
+  const finalCSV = await csv.stringify(records, {
+    header: true,
+    columns: [...getUnifiedColumnsFromMap(UNIFIED_KEYS_BY_COLUMN)],
+  }, (err, data) => {
+    console.log('stringify: \n')
+    console.log(data, err || '');
+    console.log('\n\n');
+  });
+  //4. Concat each to result array. Or create fn that takes all arrays as parameters and returns single arr
+  //TODO - implement
+
+  //5. Transform final object arr into csv.
+  //TODO - implement
+
   console.log(`\n\nTRANSFORMED RESULTS: \n`, JSON.stringify(records, null, 4));
 })();
