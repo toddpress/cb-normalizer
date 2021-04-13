@@ -1,4 +1,5 @@
-import { createReadStream } from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
+
 import csv from 'csv';
 import glob from 'glob';
 import { promisify } from 'util';
@@ -72,7 +73,6 @@ const processFile = async (url) => {
   return output;
 };
 
-// Declare the work.
 const processCoinbaseRecords = async (glob) => {
   const files = await getFilesFromPattern(glob);
   // get promise array that resolves to obj arr from csv
@@ -97,17 +97,17 @@ const getStringCSVFromObjArray = (array) => {
   );
 };
 
-// Do the work.
 (async () => {
   const glob = process.argv[2];
-  console.log(glob)
+  const target = process.argv[3] || 'transactions.csv';
   //1.1. get all CSVs for CB exports
   //1.2. iterate through files
   //1.3  transform coinbase CSVs into Binance obj arrays.
   const objs = await processCoinbaseRecords(glob);
   const output = await getStringCSVFromObjArray(objs);
-
-  console.log('\n\nstringify:\n');
-  console.log(output);
-  console.log('\n\n');
+  const stream = createWriteStream(target, { flags: 'a' });
+  stream.write(output, function () {
+    console.log('written to file! %s', target);
+  });
+  stream.end();
 })();
