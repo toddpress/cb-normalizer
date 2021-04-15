@@ -5,13 +5,11 @@
  * in a spreadsheet application. Perhaps this tool will become more sophisticated in the future by querying exchange APIs for transaction data, then normalizing that.
  * But for now, we just need something to reduce the manual legwork needed to maintain an up-to-date portfolio.
  */
+const { createReadStream, createWriteStream } = require('fs');
 
-import { createReadStream, createWriteStream } from 'fs';
-
-import csv from 'csv';
-import glob from 'glob';
-import { promisify } from 'util';
-
+const csv = require('csv');
+const glob = require('glob');
+const { promisify } = require('util');
 const globAsync = promisify(glob);
 
 // Data Maps
@@ -103,9 +101,7 @@ const getStringCSVFromObjArray = (array) => {
   );
 };
 
-(async () => {
-  const glob = process.argv[2];
-  const target = process.argv[3] || 'transactions.csv';
+module.exports = async function (glob, target) {
   const objs = await processCoinbaseRecords(glob);
   const output = await getStringCSVFromObjArray(objs);
   const stream = createWriteStream(target, { flags: 'a' });
@@ -114,4 +110,4 @@ const getStringCSVFromObjArray = (array) => {
     target.includes('.csv') || console.log('NOTE: To generate *.csv files, add csv to the end of the second arg.\n');
   });
   stream.end();
-})();
+};

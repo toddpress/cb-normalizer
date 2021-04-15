@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Takes Coinbase trade exports and transforms them into a single Binanced-shaped csv file.",
   "main": "index.js",
-  "bin": "index.js",
-  "type": "module",
+  "bin": "bin.js",
   "scripts": {
+    "builld": "pkg . --out-path ./dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
