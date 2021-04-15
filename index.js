@@ -106,14 +106,12 @@ const getStringCSVFromObjArray = (array) => {
 (async () => {
   const glob = process.argv[2];
   const target = process.argv[3] || 'transactions.csv';
-  //1.1. get all CSVs for CB exports
-  //1.2. iterate through files
-  //1.3  transform coinbase CSVs into Binance obj arrays.
   const objs = await processCoinbaseRecords(glob);
   const output = await getStringCSVFromObjArray(objs);
   const stream = createWriteStream(target, { flags: 'a' });
   stream.write(output, function () {
-    console.log('written to file! %s', target);
+    console.log('\nwritten to file! %s\n', target);
+    target.includes('.csv') || console.log('NOTE: To generate *.csv files, add csv to the end of the second arg.\n');
   });
   stream.end();
 })();
