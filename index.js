@@ -1,3 +1,11 @@
+/**
+ * Export Normalizer
+ *
+ * This tool is used to normalize csv exports from Coinbase into the Binance format for the purposes of tracking your crypto portfolio
+ * in a spreadsheet application. Perhaps this tool will become more sophisticated in the future by querying exchange APIs for transaction data, then normalizing that.
+ * But for now, we just need something to reduce the manual legwork needed to maintain an up-to-date portfolio.
+ */
+
 import { createReadStream, createWriteStream } from 'fs';
 
 import csv from 'csv';
@@ -7,7 +15,7 @@ import { promisify } from 'util';
 const globAsync = promisify(glob);
 
 // Data Maps
-const UNIFIED_KEYS_BY_COLUMN = {
+const BN_KEYS_BY_CB_COLUMN = {
   'created at': 'Date(UTC)',
   product: 'Market',
   side: 'Type',
@@ -18,29 +26,23 @@ const UNIFIED_KEYS_BY_COLUMN = {
   'price/fee/total unit': 'Fee Coin',
 };
 
-const VALUE_TRANSFORMERS_BY_ORIG_COLUMN = {
+const VALUE_TRANSFORMERS_BY_CB_COLUMN = {
   'created at': (val) => val.replace(/(T|Z)+/g, ' ').trim(),
   product: (val) => val.replace(/\-/g, ''),
   total: (val) => val.replace(/\-/g, ''),
   side: (val) => val.toUpperCase(),
 };
 
-export const getFilesFromPattern = async (pattern) => {
-  return await globAsync(pattern);
-};
-
-const getBinanceColumnsFromMap = (map) => Object.values(map);
-
 const getColumnFromMap = (map) => (column) => map[column];
 
 const getBinanceColumnName = (column) =>
-  getColumnFromMap(UNIFIED_KEYS_BY_COLUMN)(column);
+  getColumnFromMap(BN_KEYS_BY_CB_COLUMN)(column);
 
 const getColumnTransformFromMap = (map) => (column) =>
   typeof map[column] === 'function' ? map[column] : (val) => val;
 
 const getTransformerForColumn = (column) =>
-  getColumnTransformFromMap(VALUE_TRANSFORMERS_BY_ORIG_COLUMN)(column);
+  getColumnTransformFromMap(VALUE_TRANSFORMERS_BY_CB_COLUMN)(column);
 
 const transformCoinbaseEntry = ([k, v], i) => {
   const unifiedColumn = getBinanceColumnName(k);
@@ -73,13 +75,17 @@ const processFile = async (url) => {
   return output;
 };
 
+const getFilesFromPattern = async (pattern) => {
+  return await globAsync(pattern);
+};
+
 const processCoinbaseRecords = async (glob) => {
   const files = await getFilesFromPattern(glob);
-  // get promise array that resolves to obj arr from csv
   const results = await Promise.all(files.map(processFile));
-  // flatten results into a single array
   return [].concat(...results);
 };
+
+const getBinanceColumnsFromMap = (map) => Object.values(map);
 
 const getStringCSVFromObjArray = (array) => {
   return new Promise((resolve, reject) =>
@@ -87,7 +93,7 @@ const getStringCSVFromObjArray = (array) => {
       array,
       {
         header: true,
-        columns: getBinanceColumnsFromMap(UNIFIED_KEYS_BY_COLUMN),
+        columns: getBinanceColumnsFromMap(BN_KEYS_BY_CB_COLUMN),
       },
       (err, data) => {
         if (err) reject(err);
